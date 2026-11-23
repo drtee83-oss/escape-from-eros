@@ -134,6 +134,8 @@ def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, suc
         if bonusFlag != "" and st.session_state[bonusFlag]:
             roll += 2
         if roll >= successNumber:
+            if successItem != "":
+                itemAdd(successItem)
             story = generateStory(zone, action, successOutcome, successFallback)
             setResult("success", story)
         else:
@@ -392,19 +394,104 @@ else:
 
         else:
             showResult()
-            if st.session_state.resultType == "item":
-                if st.button("💊 Administer [Anti-Rad Meds]"):
+
+            if itemCheck("Anti-Rad Medication"):
+
+                if st.button("💊 Administer anti-rad medication"):
+
                     restored = restoreHealth(50)
-                    itemRemove("Anti-Rad Meds")
+                    itemRemove("Anti-Rad Medication")
+
                     story = generateStory(
                         "Casino level",
-                        "The player takes the anti-radiation medicine",
+                        "The player administers anti-radiation medication.",
                         f"The player recovers {restored} health.",
-                        "You slam the syringe into your arm, depress the plunger and wait. Gradually the nausea and tiredness ebb away."
+                        "You take the anti-radiation medication. Gradually, "
+                        "the nausea begins to subside and you feel stronger."
                     )
 
                     setResult("heal", story, restored)
-                if st.button("➡️ Keep the syringe for later"):
-                    continueGame()
-            else:
+
+            showContinueButton("Continue")
+
+# ================================================================
+# ZONE 6 - Warehouse level, second merc encounter
+# ================================================================
+
+    elif zone == "warehouse":
+        showZone("➡️ Warehouse Level", "You make your way out of the casino level and find yourself in the warehouse level. You breathe a sigh of relief: this level has direct access to the docks. As you shuffle onwards, you see two mercs arguing ahead and quickly drop down behind a nearby crate. You have two choices: fight or find an alternative route.")
+
+        if itemCheck("Anti-Rad Meds"):
+
+            if st.button("💊 Administer anti-rad medication"):
+
+                restored = restoreHealth(50)
+                itemRemove("Anti-Rad Meds")
+
+                story = generateStory(
+                    "Warehouse level",
+                    "The player takes their anti-radiation medication.",
+                    f"The player recovers {restored} health.",
+                    "You swallow the anti-radiation medication. "
+                    "Gradually, you begin to feel a little stronger."
+                )
+
+                setResult("heal", story, restored)
+
+        if not st.session_state.actionComplete:
+            left, right = st.columns(2)
+            with left:
+                chanceEncounter(
+                    "🔫 Fire at the mercs",
+                    "Warehouse level",
+                    "The player engages two armed mercenaries in a firefight. The player has the element of surprise.",
+                    4,
+                    "The player defeats both enemies and takes one of their sets of body armour",
+                    "You rapidly fire two shots at the mercenaries, aiming at the weak spot between the helmet and the shoulder pads. Both of them drop to the ground and you strip one of them of their armour.",
+                    "The player misses one of his shots, alerting the mercs to his presence and takes a bullet in the process, becoming wounded.",
+                    "Your first shot hits but your second only wings the target. The element of surprise lost, they manage to get a shot in before you dive back behind the crate, wounding you.",
+                    20,
+                    successItem="Mercenary Armour"
+                )
+            with right:
+                if st.button("🏃‍➡️ Find another route"):
+                    story = generateStory(
+                        "Warehouse level",
+                        "The player softly retraces his steps, opting for another route to the docks.",
+                        "The player avoids the fight but doesn't acquire the armour.",
+                        "You feel too weak to be confident in your chances against two armed and armoured opponents so you softly retrace your steps and try to find another route to the docks."
+                    )
+
+                    setResult("success", story)
+
+        else:
+            showResult()
+
+            if st.session_state.resultType == "success":
                 showContinueButton("Continue")
+            else:
+                left, right = st.columns(2)
+
+                with left:
+                    chanceEncounter(
+                    "🔫 Fire again!",
+                    "Warehouse level",
+                    "The player continues to engage the two armed mercenaries, the element of surprise now lost.",
+                    4,
+                    "The player defeats both enemies and takes one of their sets of body armour",
+                    "You pop out of cover, quickly firing off a volley shots. Both mercs are now down and you strip one of them of their armour.",
+                    "The player is wounded again.",
+                    "Your salvo misses the mark and you are caught by another bullet, further wounding you.",
+                    20,
+                    successItem="Mercenary Armour"
+                    )
+
+                with right:
+                    if st.button("🏃‍➡️ Find another route"):
+                        story = generateStory(
+                            "Warehouse level",
+                            "The player abandons the fight and flees down a side corridor to find a different route to the docks.",
+                            "The player escapes but does not acquire the mercenary armour.",
+                            "You feel your strength ebbing so you use what little of it you have left to retreat into a side corridor hoping to find an alternate route. You hear the mercs laughing obnoxiously behind you but they do not give chase."
+                        )
+                        setResult=("success", story)
