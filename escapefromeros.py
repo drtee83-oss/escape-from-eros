@@ -262,7 +262,7 @@ else:
     # ================================================================
 
     elif zone == "hotel":
-        showZone("🏩 Blue Falcon Hotel", "You exit the vac-tube into a dingy tunnel. A feeble blue sign reading 'BLUE FALCON HOTEL' is barely visible 200 metres spinward. As you approach the entrance, you realise that 'hotel' is a grandiose claim for what is little more than a flophouse. You walk through the door anyway, a sense of unease starting to trails its fingers down your spine. There's not much to see, just a busted old vending machine, a couple of old couches (on one of which is a shifty middle-aged woman reading a magazine), and an info terminal. The staircase to the rooms is on your right.")
+        showZone("🏩 Blue Falcon Hotel", f"You exit the vac-tube into a dingy tunnel. A feeble blue sign reading 'BLUE FALCON HOTEL' is barely visible 200 metres spinward. As you approach the entrance, you realise that 'hotel' is a grandiose claim for what is little more than a flophouse. \nYou walk through the door anyway, a sense of unease starting to trail its fingers down your spine. There's not much to see, just a busted old vending machine, a couple of old couches (on one of which is a shifty middle-aged woman reading a magazine), and an info terminal. \nThe staircase to the rooms is on your right.")
         if not st.session_state.actionComplete:
             left, right = st.columns(2)
             with left:
@@ -271,8 +271,8 @@ else:
                     story = generateStory(
                         "Hotel/flophouse called The Blue Falcon Hotel",
                         "The player checks the room listings on the terminal and spots 'Lionel Polanski', a known alias of Julie Mao, in room 25.",
-                        "The player notes the room number down and heads up the stairs to find it. Upon entering the room, they find Julie Mao dead in the shower, her corpse infected with some kind of glowing blue organism. All electronic devices in the room have been destroyed.",
-                        "You apprehensively climb the stairs and find room 25. As you enter, a smell of sick death assails your nostrils. You notice that the light switch doesn't work and there isn't the usual glow of electronics. You find Julie in the show, dead and infected by a glowing blue organism of some kind."
+                        "The player notes the room number down and turns to head up the stairs",
+                        "You swipe through the list of guests and find Lionel Polanski, a known alias of Julie Mao, in room 25. You make a mental note of the room number and turn towards the stairs."
                     )
                     setResult("story", story)
             with right:
@@ -282,13 +282,13 @@ else:
                             "Hotel/flophouse called The Blue Falcon Hotel",
                             "The player checks the room listings on the terminal and spots 'Lionel Polanski', a known alias of Julie Mao, in room 25.",
                             "The player notes the room number down and heads up the stairs to find it. Upon entering the room, they find Julie Mao dead in the shower, her corpse infected with some kind of glowing blue organism. All electronic devices in the room have been destroyed.",
-                            "You apprehensively climb the stairs and find room 25. As you enter, a smell of sick death assails your nostrils. You notice that the light switch doesn't work and there isn't the usual glow of electronics. You find Julie in the show, dead and infected by a glowing blue organism of some kind."
+                            "You apprehensively climb the stairs and find room 25. As you enter, a rotting smell assails your nostrils. You notice that the light switch doesn't work and there isn't the usual glow of electronics. You find Julie in the shower, dead and infected by a glowing blue organism of some kind."
                     )
                         setResult("success", story)
                     else:
                         story = generateStory(
                             "Hotel/flophouse called The Blue Falcon Hotel",
-                            "The player goes straight up the stairs and picks a random, wrong room.",
+                            "The player goes straight up the stairs and picks a random, wrong room number between 20 and 30 but not 25.",
                             "The player knocks on the wrong door and a cantankerous old man shouts at him for disturbing his meal. The player decides to return to the lobby to check the terminal.",
                             "You realise you don't know which room Julie is in so you pick one at random and knock on the door. An old man in a stained bathrobe opens it. 'WHADAYOOWANT?!', he yells, 'CAN'T A GUY HAVE DINNER IN PEACE?!' He slams the door but you still hear him muttering obscenities through the flimsy material."
                         )
