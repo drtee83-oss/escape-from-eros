@@ -414,9 +414,9 @@ else:
 
             showContinueButton("Continue")
 
-# ================================================================
-# ZONE 6 - Warehouse level, second merc encounter
-# ================================================================
+    # ================================================================
+    # ZONE 6 - Warehouse level, second merc encounter
+    # ================================================================
 
     elif zone == "warehouse":
         showZone("➡️ Warehouse Level", "You make your way out of the casino level and find yourself in the warehouse level. You breathe a sigh of relief: this level has direct access to the docks. As you shuffle onwards, you see two mercs arguing ahead and quickly drop down behind a nearby crate. You have two choices: fight or find an alternative route.")
@@ -495,3 +495,40 @@ else:
                             "You feel your strength ebbing so you use what little of it you have left to retreat into a side corridor hoping to find an alternate route. You hear the mercs laughing obnoxiously behind you but they do not give chase."
                         )
                         setResult=("success", story)
+    # ================================================================
+    # ZONE 7 - Docks exit, escape sequence
+    # ================================================================
+
+    elif zone == "docks2":
+        showZone(
+            "🚀 Eros Docking Ring: Berth D34",
+            "You finally manage to reach an airlock where a ship is still moored. Almost at the end of your strength, you nearly collapse to the floor when you see two heavily armed guards flanking the sealed door. You decide to see if you can blag your way past them."
+        )
+        if not st.session_state.actionComplete:
+            chanceEncounter(
+                "🥷 Sneak past the guards",
+                "Eros Docking Ring: Berth D34",
+                "The player tries to sneak past the guards. If they have the Mercenary Armour then they hide down a corridor to put it on before attempting to sneak past.",
+                5,
+                "The player successfully talks their way past the guards and enters the ship. He sees the ship's name, 'Rocinante', and thinks it oddly familiar",
+                "You engage the guards in conversation and somehow manage to finagle your way on board the ship.",
+                "The player tries to sneak past the guards but they're suspicious so he has to flee and try something else.",
+                "You try to engage the guards in conversation but they raise their rifles and order you back to the radiation shelter. Maybe you need to try a new tack.",
+                20,
+                bonusItem="Mercenary Armour"
+            )
+        else:
+            showResult()
+            if st.session_state.resultType == "success":
+                st.balloons()
+                st.title("🎉 ESCAPE SUCCESSFUL!")
+                st.write("You board the ship to find the crew about ready to depart. They seem to have no objection to another passenger so you settle into a crash couch, glad to leave the cursed asteroid behind.")
+
+                st.success("Congratulations!")
+
+                if st.button("🔁 Play Again?"):
+                    restartGame()
+
+            else:
+                if st.button("🥷 Try sneaking again?"):
+                    resetAction()
