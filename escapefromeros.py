@@ -237,12 +237,12 @@ else:
                         )
                     setResult("other", story)
             with right:
-                if st.button("➡️ Move on"):
+                if st.button("➡️ Take the vac-tube to the Blue Falcon Hotel"):
                     st.session_state.noodles = False
                     story = generateStory(
                         "Casino Level", 
                         "the player decides not to accept the invitation, instead moving on as they're in a rush", 
-                        "You briefly clasp Sematimba's shoulder and say 'some other time, buddy' before hurrying off.", 
+                        "You briefly clasp Sematimba's shoulder and say 'some other time, buddy' before hurrying off towards the nearest vac-tube station.", 
                         "'Sorry, buddy', you say, 'in a hell of a rush right now. Rain check?' 'Sure thing...', a bemused Sematimba says, watching you stride on towards the nearest vac-tube station."
                         )
                     setResult("story", story)
