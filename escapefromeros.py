@@ -215,7 +215,7 @@ else:
     # FIRST ZONE - Eros Docking Ring, Sematimba meeting
     # ================================================================
     if zone == "docks1":
-        showZone(f"🚀 Eros Docking Ring", "You stroll past the immigration officer, still gawking at your surroundings. You hear a familar voice ring out, 'there you are, you old fraud! We you gonna walk on by without saying hi to an old friend?'")
+        showZone(f"🚀 Eros Docking Ring", "You stroll past the immigration officer, still gawking at your surroundings. You hear a familar voice ring out, 'there you are, you old fraud! Were you gonna walk on by without saying hi to an old friend?'")
         showContinueButton("🚶‍➡️ Greet your old buddy")
 
     # ================================================================
