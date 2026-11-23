@@ -221,3 +221,31 @@ else:
     # ================================================================
     # SECOND ZONE - Casino level 1, Noodle cart
     # ================================================================
+
+    elif zone == "casino1":
+        showZone("🕯️ Casino Level", "A riot of sound and colour assault your senses as you step into one of Eros' three famed casino levels. Your old friend, Sematimba, all but drags you to a noodle cart. 'Try the soba! Best in the belt!', he claims enthusiastically.")
+        if not st.session_state.actionComplete:
+            left, right = st.columns(2)
+            with left:
+                if st.button("🔎 Sit and eat"):
+                    st.session_state.noodles = True
+                    story = generateStory(
+                        "Casino Level", 
+                        "the player sits down with Sematimba, a cop on Eros, to eat noodles and trade war stories about the interjurisdictional case they worked together while the player was a detective on Ceres", 
+                        "The player is happy to have seen and reconnected with a friendly face and Sematimba says to the player that if they need a hand while they're on Eros, to reach out to him.", 
+                        "You sit at the grimy noodle cart and order the same as Sematimba. As you eat, you reminisce about a case you both worked together. As you finish up and stand up to move on, Sematimba claps your shoulder. 'You need a hand while you're here, you know where to find me.'"
+                        )
+                    setResult("other", story)
+            with right:
+                if st.button("➡️ Move on"):
+                    st.session_state.noodles = False
+                    story = generateStory(
+                        "Casino Level", 
+                        "the player decides not to accept the invitation, instead moving on as they're in a rush", 
+                        "You briefly clasp Sematimba's shoulder and say 'some other time, buddy' before hurrying off.", 
+                        "'Sorry, buddy', you say, 'in a hell of a rush right now. Rain check?' 'Sure thing...', a bemused Sematimba says, watching you stride on towards the nearest vac-tube station."
+                        )
+                    setResult("story", story)
+        else:
+            showResult()
+            showContinueButton()
