@@ -85,7 +85,7 @@ def generateStory(zone, action, outcome, fallback):
     inventoryText = ", ".join(st.session_state.inventory)
 
     prompt = f"""
-You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
+You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
  
 Player: {st.session_state.playerName}
 Room: {zone}
@@ -185,6 +185,13 @@ def showContinueButton(text = "Continue"):
     if st.button(text):
         continueGame()
 
+def resetAction():
+    st.session_state.resultType = ""
+    st.session_state.resultMessage = ""
+    st.session_state.resultValue = ""
+    st.session_state.actionComplete = False
+    st.rerun()
+
 # ================================================================
 # START SCREEN - Arrival at Eros docks
 # ================================================================
@@ -212,14 +219,14 @@ else:
         st.stop()
 
     # ================================================================
-    # FIRST ZONE - Eros Docking Ring, Sematimba meeting
+    # ZONE 1 - Eros Docking Ring, Sematimba meeting
     # ================================================================
     if zone == "docks1":
         showZone(f"🚀 Eros Docking Ring", "You stroll past the immigration officer, still gawking at your surroundings. You hear a familar voice ring out, 'there you are, you old fraud! Were you gonna walk on by without saying hi to an old friend?'")
         showContinueButton("🚶‍➡️ Greet your old buddy")
 
     # ================================================================
-    # SECOND ZONE - Casino level 1, Noodle cart
+    # ZONE 2 - Casino level 1, noodle cart
     # ================================================================
 
     elif zone == "casino1":
@@ -227,7 +234,7 @@ else:
         if not st.session_state.actionComplete:
             left, right = st.columns(2)
             with left:
-                if st.button("🔎 Sit and eat"):
+                if st.button("🍜 Sit and eat"):
                     st.session_state.noodles = True
                     story = generateStory(
                         "Casino Level", 
@@ -235,9 +242,9 @@ else:
                         "The player is happy to have seen and reconnected with a friendly face and Sematimba says to the player that if they need a hand while they're on Eros, to reach out to him.", 
                         "You sit at the grimy noodle cart and order the same as Sematimba. As you eat, you reminisce about a case you both worked together. As you finish up and stand up to move on, Sematimba claps your shoulder. 'You need a hand while you're here, you know where to find me.'"
                         )
-                    setResult("other", story)
+                    setResult("story", story)
             with right:
-                if st.button("➡️ Take the vac-tube to the Blue Falcon Hotel"):
+                if st.button("🙂‍↔️ Decline the invitation"):
                     st.session_state.noodles = False
                     story = generateStory(
                         "Casino Level", 
@@ -248,4 +255,48 @@ else:
                     setResult("story", story)
         else:
             showResult()
-            showContinueButton()
+            showContinueButton("🚅 Board the vac-tube to the residential level")
+
+    # ================================================================
+    # ZONE 3 - Hotel level, find Julie Mao
+    # ================================================================
+
+    elif zone == "hotel":
+        showZone("🏩 Blue Falcon Hotel", "You exit the vac-tube into a dingy tunnel. A feeble blue sign reading 'BLUE FALCON HOTEL' is barely visible 200 metres spinward. As you approach the entrance, you realise that 'hotel' is a grandiose claim for what is little more than a flophouse. You walk through the door anyway, a sense of unease starting to trails its fingers down your spine. There's not much to see, just a busted old vending machine, a couple of old couches (on one of which is a shifty middle-aged woman reading a magazine), and an info terminal. The staircase to the rooms is on your right.")
+        if not st.session_state.actionComplete:
+            left, right = st.columns(2)
+            with left:
+                if st.button("🖥️ Access the terminal"):
+                    st.session_state.terminal = True
+                    story = generateStory(
+                        "Hotel/flophouse called The Blue Falcon Hotel",
+                        "The player checks the room listings on the terminal and spots 'Lionel Polanski', a known alias of Julie Mao, in room 25.",
+                        "The player notes the room number down and heads up the stairs to find it. Upon entering the room, they find Julie Mao dead in the shower, her corpse infected with some kind of glowing blue organism. All electronic devices in the room have been destroyed.",
+                        "You apprehensively climb the stairs and find room 25. As you enter, a smell of sick death assails your nostrils. You notice that the light switch doesn't work and there isn't the usual glow of electronics. You find Julie in the show, dead and infected by a glowing blue organism of some kind."
+                    )
+                    setResult("story", story)
+            with right:
+                if st.button("🪜 Climb the stairs"):
+                    if st.session_state.terminal:
+                        story = generateStory(
+                            "Hotel/flophouse called The Blue Falcon Hotel",
+                            "The player checks the room listings on the terminal and spots 'Lionel Polanski', a known alias of Julie Mao, in room 25.",
+                            "The player notes the room number down and heads up the stairs to find it. Upon entering the room, they find Julie Mao dead in the shower, her corpse infected with some kind of glowing blue organism. All electronic devices in the room have been destroyed.",
+                            "You apprehensively climb the stairs and find room 25. As you enter, a smell of sick death assails your nostrils. You notice that the light switch doesn't work and there isn't the usual glow of electronics. You find Julie in the show, dead and infected by a glowing blue organism of some kind."
+                    )
+                        setResult("success", story)
+                    else:
+                        story = generateStory(
+                            "Hotel/flophouse called The Blue Falcon Hotel",
+                            "The player goes straight up the stairs and picks a random, wrong room.",
+                            "The player knocks on the wrong door and a cantankerous old man shouts at him for disturbing his meal. The player decides to return to the lobby to check the terminal.",
+                            "You realise you don't know which room Julie is in so you pick one at random and knock on the door. An old man in a stained bathrobe opens it. 'WHADAYOOWANT?!', he yells, 'CAN'T A GUY HAVE DINNER IN PEACE?!' He slams the door but you still hear him muttering obscenities through the flimsy material."
+                        )
+                        setResult("story", story)
+        else:
+            showResult()
+            if st.session_state.resultType == "success":
+                showContinueButton("Continue")
+            else:
+                if st.button("↩️ Return to the lobby"):
+                    resetAction()
