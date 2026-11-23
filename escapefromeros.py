@@ -31,7 +31,7 @@ def startGame(name):
     st.session_state.health = 100
     st.session_state.healthMax = 100
     st.session_state.inventory = ["Pistol"]
-    st.session_state.zones = ["docks1", "casino1", "hotel", "casino2",
+    st.session_state.zones = ["docks1", "casino1", "hotel", "residential", "casino2",
         "warehouse", "docks2"]
     st.session_state.zoneNumber = 0
     st.session_state.resultType = ""
@@ -78,55 +78,59 @@ def restoreHealth(amount):
     return st.session_state.health - healthOld
 
 def generateStory(zone, action, outcome, fallback):
-    if client == None:
-        return fallback
+# Temporarily disabled AI for testing
+    return fallback
+#     if client == None:
+#         return fallback
 
 
-    inventoryText = ", ".join(st.session_state.inventory)
+#     inventoryText = ", ".join(st.session_state.inventory)
 
-    prompt = f"""
-You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
+#     prompt = f"""
+# You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
  
-Player: {st.session_state.playerName}
-Room: {zone}
-Health: {st.session_state.health}/{st.session_state.healthMax}
-Inventory: {inventoryText}
+# Player: {st.session_state.playerName}
+# Room: {zone}
+# Health: {st.session_state.health}/{st.session_state.healthMax}
+# Inventory: {inventoryText}
  
-Action:
-{action}
+# Action:
+# {action}
  
-Outcome:
-{outcome}
+# Outcome:
+# {outcome}
  
-Describe what happens in 30-50 words.
+# Describe what happens in 30-50 words.
  
-Use second person.
-Use gritty sci-fi language.
-Do not change the outcome.
-Do not change health or inventory.
-Do not introduce new choices.
-"""
-    try:
-        interaction = client.interactions.create(
-            model="gemini-3.5-flash-lite",
-            input=prompt,
-            generation_config={"thinking_level": "minimal"}
-        )
-        if interaction.output_text:
-            return interaction.output_text
-        return fallback
-    except Exception as error:
-        st.error(f"Gemini error: {error}")
-        return fallback
+# Use second person.
+# Use gritty sci-fi language.
+# Do not change the outcome.
+# Do not change health or inventory.
+# Do not introduce new choices.
+# """
+#     try:
+#         interaction = client.interactions.create(
+#             model="gemini-3.5-flash-lite",
+#             input=prompt,
+#             generation_config={"thinking_level": "minimal"}
+#         )
+#         if interaction.output_text:
+#             return interaction.output_text
+#         return fallback
+#     except Exception as error:
+#         st.error(f"Gemini error: {error}")
+#         return fallback
 
 def rng():
     return random.randint(1,6)
 
-def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, successFallback, failureOutcome, failureFallback, damage, bonusItem ="", successItem=""):
+def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, successFallback, failureOutcome, failureFallback, damage, bonusItem ="", successItem="", bonusFlag=""):
     if st.button(buttonText):
         roll = rng()
         if bonusItem != "" and itemCheck(bonusItem):
             roll = roll + 2
+        if bonusFlag != "" and st.session_state[bonusFlag]:
+            roll += 2
         if roll >= successNumber:
             story = generateStory(zone, action, successOutcome, successFallback)
             setResult("success", story)
@@ -274,7 +278,7 @@ else:
                         "The player notes the room number down and turns to head up the stairs",
                         "You swipe through the list of guests and find Lionel Polanski, a known alias of Julie Mao, in room 25. You make a mental note of the room number and turn towards the stairs."
                     )
-                    setResult("story", story)
+                    setResult("success", story)
             with right:
                 if st.button("🪜 Climb the stairs"):
                     if st.session_state.terminal:
@@ -300,3 +304,40 @@ else:
             else:
                 if st.button("↩️ Return to the lobby"):
                     resetAction()
+
+    # ================================================================
+    # ZONE 4 - Residential tunnel, shootout with mercs
+    # ================================================================
+
+    elif zone == "residential":
+        showZone("➡️ Residential Tunnel", "You exit the hotel back into the tunnel. You are ambushed by mercenaries in body armour toting rifles. You take cover in the doorway of a nearby pachinko parlour.")
+        if not st.session_state.actionComplete:
+            chanceEncounter(
+                "🔫 Fire at the mercenaries",
+                "Blue Falcon Hotel",
+                "The player engages a pair of armed mercs in a firefight. If the player ate noodles with Sematimba earlier, he provides backup.",
+                4,
+                "You fell both attackers!",
+                "You return fire, ducking in and out of the doorway between shots. Both attackers are finally downed and the coast is clear!",
+                "The player is wounded during the firefight but survives.",
+                "You exchange fire with the mercs, but one of them wings you. You fire a couple more shots, driving them back into cover.",
+                20,
+                bonusFlag="noodles"
+            )
+        else:
+            showResult()
+            if st.session_state.resultType == "success":
+                showContinueButton("Continue")
+            else:
+                chanceEncounter(
+                    "🔫 Fire again!",
+                    "Blue Falcon Hotel",
+                    "The player continues to exchange fire with the mercenaries.",
+                    4,
+                    "You fell both attackers!",
+                    "You return fire, still ducking in and out of cover. Both attackers are finally downed and the coast is clear!",
+                    "The player takes another graze from a bullet.",
+                    "Another bullet grazes you. Your breath it starting to come in ragged gasps but you keep on fighting.",
+                    20,
+                    bonusFlag="noodles"
+                )
