@@ -40,6 +40,8 @@ def startGame(name):
     st.session_state.actionComplete = False
     st.session_state.noodles = False
     st.session_state.terminal = False
+    st.session_state.radDamageApplied = False
+    st.session_state.radDamage = 0
 
 def restartGame():
     st.session_state.clear()
@@ -341,3 +343,68 @@ else:
                     20,
                     bonusFlag="noodles"
                 )
+
+    # ================================================================
+    # ZONE 5 - Casino level 2, rad shelter incident
+    # ================================================================
+
+    elif zone == "casino2":
+        showZone("➡️ Casino Level", "The coast clear, you head down the ramp back to the Casino Level. As you walk, you hear a loud klaxon and an announcement on the PA system: 'Citizens of Eros, there has been an uncontained engine explosion in docking bay D74. As a precaution, all citizens are advised to head to the nearest hard radiation shelter. Officers will be on hand to guide you. There is no need for panic so please proceed in a calm and orderley manner.' You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
+
+        if not st.session_state.radDamageApplied:
+            damage = random.choice([30, 40, 50, 60])
+            takeDamage(damage)
+            st.session_state.radDamageApplied = True
+            st.session_state.radDamage = damage
+
+            st.rerun()
+
+        if not st.session_state.actionComplete:
+            st.error(
+                f"☢️ Exposed to high energy gamma radiation. You lose {st.session_state.radDamage} health!"
+            )
+
+            st.write(
+                "You stumble, still half blinded and suddenly weary. You notice a clinic across the tunnel. Maybe they have meds that can alleviate the symptons long enough for you to get off this rock."
+            )
+            left, right = st.columns(2)
+            with left:
+                if st.button("🏥 Stumble towards the clinic"):
+                    itemAdd("Anti-Rad Meds")
+                    story = generateStory(
+                        "Casino level medical clinic",
+                        "The player stumbles into the clinic seeking medicine for radiation exposure",
+                        "The player find some anti-radiation medicine and pockets it.",
+                        "You stagger into the clinic and see some anti-radiation medicine on the counter. You breathe a sigh of relief as you pocket the syringe.",
+                    )
+                    setResult("item", story, "Anti-rad Meds")
+
+            with right:
+                if st.button("➡️ Keep moving"):
+                    story = generateStory(
+                        "Casino level",
+                        "The player ignores the clinic and presses onwards",
+                        "The player decides to move on despite the radiation sickness",
+                        "You decide that time is of the essence and hurry on towards the docks.",
+                    )
+
+                    setResult("success", story)
+
+        else:
+            showResult()
+            if st.session_state.resultType == "item":
+                if st.button("💊 Administer [Anti-Rad Meds]"):
+                    restored = restoreHealth(50)
+                    itemRemove("Anti-Rad Meds")
+                    story = generateStory(
+                        "Casino level",
+                        "The player takes the anti-radiation medicine",
+                        f"The player recovers {restored} health.",
+                        "You slam the syringe into your arm, depress the plunger and wait. Gradually the nausea and tiredness ebb away."
+                    )
+
+                    setResult("heal", story, restored)
+                if st.button("➡️ Keep the syringe for later"):
+                    continueGame()
+            else:
+                showContinueButton("Continue")
