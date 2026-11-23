@@ -19,7 +19,7 @@ st.set_page_config(page_title="Escape from Eros", page_icon="🚀", layout="cent
 st.title("🚀 ESCAPE FROM EROS 🚀")
 
 # ================================================================
-# GAME SETUP - PERSISTENT VARIABLES AND AI PROMPT
+# GAME SETUP - Persistent values and AI prompt
 # ================================================================
 
 if "gameStarted" not in st.session_state:
@@ -39,7 +39,7 @@ def startGame(name):
     st.session_state.resultValue = ""
     st.session_state.actionComplete = False
     st.session_state.noodles = False
-    st.session_state.terminal - False
+    st.session_state.terminal = False
 
 def restartGame():
     st.session_state.clear()
@@ -137,10 +137,10 @@ def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, suc
         st.rerun()
 
 # ================================================================
-# REUSABLE FUNCTIONS
+# REUSABLE FUNCTIONS - Text and interactive elements
 # ================================================================
 
-def showRoom(title, description):
+def showZone(title, description):
     st.header(title)
     st.write(description)
  
@@ -152,7 +152,7 @@ def showPlayerInfo():
     with right:
         st.write(f"🎒 Inventory: {', '.join(st.session_state.inventory)}")  
     st.caption(
-        f"Room {st.session_state.zoneNumber + 1} "
+        f"Zone {st.session_state.zoneNumber + 1} "
         f"of {len(st.session_state.zones)}"
     )
     st.divider()
@@ -184,3 +184,40 @@ def showResult():
 def showContinueButton(text = "Continue"):
     if st.button(text):
         continueGame()
+
+# ================================================================
+# START SCREEN - Arrival at Eros docks
+# ================================================================
+
+if not st.session_state.gameStarted:
+    st.write("You disembark the ship, glad to leave the cramped, hot cabin of the ancient passenger transport. As you step onto the docks of another world, you gaze around, heedless of the other arrivals pushing past you. 'Not all the different from Ceres...', you muse.")
+    name = st.text_input("An immigration officer saunters over, a sly smile on his face as he asks you for your ID. 'So, who do we got here, beratna?', he asks in a thick Belter accent.")
+ 
+    if st.button("Present ID and enter Eros Station"):
+        if name.strip():
+            startGame(name)
+            st.rerun()
+        else:
+            st.warning("'Don't sound like no name I ever heard of. Wanna run that by me again?', the immigration officer asks.")
+else:
+    # Show the same player information on every room.
+    showPlayerInfo()
+    zone = getCurrentZone()
+
+    if st.session_state.health <= 0:
+        showZone("💀 You Died", "As the last of your strength ebbs, you fatalistically mumble, 'some you win, some you lose...'")
+        st.error("Mission failed...")
+        if st.button("🔄 Retry?"):
+            restartGame()
+        st.stop()
+
+    # ================================================================
+    # FIRST ZONE - Eros Docking Ring, Sematimba meeting
+    # ================================================================
+    if zone == "docks1":
+        showZone(f"🚀 Eros Docking Ring", "You stroll past the immigration officer, still gawking at your surroundings. You hear a familar voice ring out, 'there you are, you old fraud! We you gonna walk on by without saying hi to an old friend?'")
+        showContinueButton("🚶‍➡️ Greet your old buddy")
+
+    # ================================================================
+    # SECOND ZONE - Casino level 1, Noodle cart
+    # ================================================================
