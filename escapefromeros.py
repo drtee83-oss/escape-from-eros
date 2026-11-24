@@ -80,48 +80,48 @@ def restoreHealth(amount):
     return st.session_state.health - healthOld
 
 def generateStory(zone, action, outcome, fallback):
-# Temporarily disabled AI for testing
-    return fallback
-#     if client == None:
-#         return fallback
+# Temporarily disable AI for testing
+#    return fallback
+    if client == None:
+        return fallback
 
 
-#     inventoryText = ", ".join(st.session_state.inventory)
+    inventoryText = ", ".join(st.session_state.inventory)
 
-#     prompt = f"""
-# You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
+    prompt = f"""
+You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
  
-# Player: {st.session_state.playerName}
-# Room: {zone}
-# Health: {st.session_state.health}/{st.session_state.healthMax}
-# Inventory: {inventoryText}
+Player: {st.session_state.playerName}
+Room: {zone}
+Health: {st.session_state.health}/{st.session_state.healthMax}
+Inventory: {inventoryText}
  
-# Action:
-# {action}
+Action:
+{action}
  
-# Outcome:
-# {outcome}
+Outcome:
+{outcome}
  
-# Describe what happens in 30-50 words.
+Describe what happens in 30-50 words.
  
-# Use second person.
-# Use gritty sci-fi language.
-# Do not change the outcome.
-# Do not change health or inventory.
-# Do not introduce new choices.
-# """
-#     try:
-#         interaction = client.interactions.create(
-#             model="gemini-3.5-flash-lite",
-#             input=prompt,
-#             generation_config={"thinking_level": "minimal"}
-#         )
-#         if interaction.output_text:
-#             return interaction.output_text
-#         return fallback
-#     except Exception as error:
-#         st.error(f"Gemini error: {error}")
-#         return fallback
+Use second person.
+Use gritty sci-fi language.
+Do not change the outcome.
+Do not change health or inventory.
+Do not introduce new choices.
+"""
+    try:
+        interaction = client.interactions.create(
+            model="gemini-3.5-flash-lite",
+            input=prompt,
+            generation_config={"thinking_level": "minimal"}
+        )
+        if interaction.output_text:
+            return interaction.output_text
+        return fallback
+    except Exception as error:
+        st.error(f"Gemini error: {error}")
+        return fallback
 
 def rng():
     return random.randint(1,6)
@@ -205,17 +205,16 @@ def resetAction():
 # ================================================================
 
 if not st.session_state.gameStarted:
-    st.write("You disembark the ship, glad to leave the cramped, hot cabin of the ancient passenger transport. As you step onto the docks of another world, you gaze around, heedless of the other arrivals pushing past you. 'Not all the different from Ceres...', you muse.")
+    st.write("You disembark the ship, glad to leave the cramped, hot cabin of the ancient passenger transport. As you step onto the docks of another world, you gaze around, heedless of the other arrivals pushing past you. 'Not all that different from Ceres...', you muse.")
     name = st.text_input("An immigration officer saunters over, a sly smile on his face as he asks you for your ID. 'So, who do we got here, beratna?', he asks in a thick Belter accent.")
  
-    if st.button("Present ID and enter Eros Station"):
+    if st.button("🛂Present ID and enter Eros Station"):
         if name.strip():
             startGame(name)
             st.rerun()
         else:
             st.warning("'Don't sound like no name I ever heard of. Wanna run that by me again?', the immigration officer asks.")
 else:
-    # Show the same player information on every room.
     showPlayerInfo()
     zone = getCurrentZone()
 
@@ -231,14 +230,14 @@ else:
     # ================================================================
     if zone == "docks1":
         showZone(f"🚀 Eros Docking Ring", "You stroll past the immigration officer, still gawking at your surroundings. You hear a familar voice ring out, 'there you are, you old fraud! Were you gonna walk on by without saying hi to an old friend?'")
-        showContinueButton("🚶‍➡️ Greet your old buddy")
+        showContinueButton("🤝 Greet your old buddy")
 
     # ================================================================
     # ZONE 2 - Casino level 1, noodle cart
     # ================================================================
 
     elif zone == "casino1":
-        showZone("🕯️ Casino Level", "A riot of sound and colour assault your senses as you step into one of Eros' three famed casino levels. Your old friend, Sematimba, all but drags you to a noodle cart. 'Try the soba! Best in the belt!', he claims enthusiastically.")
+        showZone("🎲 Casino Level", "A riot of sound and colour assault your senses as you step into one of Eros' three famed casino levels. Your old friend, Sematimba, all but drags you to a noodle cart. 'Try the soba! Best in the Belt!', he claims enthusiastically.")
         if not st.session_state.actionComplete:
             left, right = st.columns(2)
             with left:
@@ -246,18 +245,18 @@ else:
                     st.session_state.noodles = True
                     story = generateStory(
                         "Casino Level", 
-                        "the player sits down with Sematimba, a cop on Eros, to eat noodles and trade war stories about the interjurisdictional case they worked together while the player was a detective on Ceres", 
+                        "The player sits down with Sematimba, a cop on Eros, to eat noodles and trade war stories about the interjurisdictional case they worked together while the player was a detective on Ceres.", 
                         "The player is happy to have seen and reconnected with a friendly face and Sematimba says to the player that if they need a hand while they're on Eros, to reach out to him.", 
                         "You sit at the grimy noodle cart and order the same as Sematimba. As you eat, you reminisce about a case you both worked together. As you finish up and stand up to move on, Sematimba claps your shoulder. 'You need a hand while you're here, you know where to find me.'"
                         )
                     setResult("story", story)
             with right:
-                if st.button("🙂‍↔️ Decline the invitation"):
+                if st.button("🙂‍↔ Decline the invitation"):
                     st.session_state.noodles = False
                     story = generateStory(
                         "Casino Level", 
-                        "the player decides not to accept the invitation, instead moving on as they're in a rush", 
-                        "You briefly clasp Sematimba's shoulder and say 'some other time, buddy' before hurrying off towards the nearest vac-tube station.", 
+                        "The player decides not to accept the invitation, instead moving on as they're in a rush.", 
+                        "The player briefly clasps Sematimba's shoulder and say 'some other time, buddy' before hurrying off towards the nearest vac-tube station.", 
                         "'Sorry, buddy', you say, 'in a hell of a rush right now. Rain check?' 'Sure thing...', a bemused Sematimba says, watching you stride on towards the nearest vac-tube station."
                         )
                     setResult("story", story)
@@ -279,7 +278,7 @@ else:
                     story = generateStory(
                         "Hotel/flophouse called The Blue Falcon Hotel",
                         "The player checks the room listings on the terminal and spots 'Lionel Polanski', a known alias of Julie Mao, in room 25.",
-                        "The player notes the room number down and turns to head up the stairs",
+                        "The player notes the room number down and turns to head up the stairs.",
                         "You swipe through the list of guests and find Lionel Polanski, a known alias of Julie Mao, in room 25. You make a mental note of the room number and turn towards the stairs."
                     )
                     setResult("success", story)
@@ -314,7 +313,7 @@ else:
     # ================================================================
 
     elif zone == "residential":
-        showZone("➡️ Residential Tunnel", "You exit the hotel back into the tunnel. You are ambushed by mercenaries in body armour toting rifles. You take cover in the doorway of a nearby pachinko parlour.")
+        showZone("🏘️ Residential Tunnel", "You exit the hotel back into the tunnel. You are ambushed by mercenaries in body armour toting rifles. You take cover in the doorway of a nearby pachinko parlour.")
         if not st.session_state.actionComplete:
             chanceEncounter(
                 "🔫 Fire at the mercenaries",
@@ -341,7 +340,7 @@ else:
                     "You fell both attackers!",
                     "You return fire, still ducking in and out of cover. Both attackers are finally downed and the coast is clear!",
                     "The player takes another graze from a bullet.",
-                    "Another bullet grazes you. Your breath it starting to come in ragged gasps but you keep on fighting.",
+                    "Another bullet grazes you. Your breath is starting to come in ragged gasps but you keep on fighting.",
                     20,
                     bonusFlag="noodles"
                 )
@@ -351,7 +350,7 @@ else:
     # ================================================================
 
     elif zone == "casino2":
-        showZone("➡️ Casino Level", "The coast clear, you head down the ramp back to the Casino Level. As you walk, you hear a loud klaxon and an announcement on the PA system: 'Citizens of Eros, there has been an uncontained engine explosion in docking bay D74. As a precaution, all citizens are advised to head to the nearest hard radiation shelter. Officers will be on hand to guide you. There is no need for panic so please proceed in a calm and orderley manner.' You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
+        showZone("🎲 Casino Level", "The coast clear, you head down the ramp back to the Casino Level. As you walk, you hear a loud klaxon and an announcement on the PA system: 'Citizens of Eros, there has been an uncontained engine explosion in docking bay D74. As a precaution, all citizens are advised to head to the nearest hard radiation shelter. Officers will be on hand to guide you. There is no need for panic so please proceed in a calm and orderley manner.' You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
 
         if not st.session_state.radDamageApplied:
             damage = random.choice([30, 40, 50, 60])
@@ -367,7 +366,7 @@ else:
             )
 
             st.write(
-                "You stumble, still half blinded and suddenly weary. You notice a clinic across the tunnel. Maybe they have meds that can alleviate the symptons long enough for you to get off this rock."
+                "You stumble, still half blinded and suddenly weary. You notice a clinic across the tunnel. Maybe they have meds that can alleviate the symptoms long enough for you to get off this rock."
             )
             left, right = st.columns(2)
             with left:
@@ -375,7 +374,7 @@ else:
                     itemAdd("Anti-Rad Meds")
                     story = generateStory(
                         "Casino level medical clinic",
-                        "The player stumbles into the clinic seeking medicine for radiation exposure",
+                        "The player stumbles into the clinic seeking medicine for radiation exposure.",
                         "The player find some anti-radiation medicine and pockets it.",
                         "You stagger into the clinic and see some anti-radiation medicine on the counter. You breathe a sigh of relief as you pocket the syringe.",
                     )
@@ -385,8 +384,8 @@ else:
                 if st.button("➡️ Keep moving"):
                     story = generateStory(
                         "Casino level",
-                        "The player ignores the clinic and presses onwards",
-                        "The player decides to move on despite the radiation sickness",
+                        "The player ignores the clinic and presses onwards.",
+                        "The player decides to move on despite the radiation sickness.",
                         "You decide that time is of the essence and hurry on towards the docks.",
                     )
 
@@ -404,10 +403,9 @@ else:
 
                     story = generateStory(
                         "Casino level",
-                        "The player administers anti-radiation medication.",
+                        "The player takes their anti-radiation medication.",
                         f"The player recovers {restored} health.",
-                        "You take the anti-radiation medication. Gradually, "
-                        "the nausea begins to subside and you feel stronger."
+                        "You take the anti-radiation medication. Gradually, the nausea begins to subside and you feel stronger."
                     )
 
                     setResult("heal", story, restored)
@@ -419,7 +417,7 @@ else:
     # ================================================================
 
     elif zone == "warehouse":
-        showZone("➡️ Warehouse Level", "You make your way out of the casino level and find yourself in the warehouse level. You breathe a sigh of relief: this level has direct access to the docks. As you shuffle onwards, you see two mercs arguing ahead and quickly drop down behind a nearby crate. You have two choices: fight or find an alternative route.")
+        showZone("🏭 Warehouse Level", "You make your way out of the casino level and find yourself in the warehouse level. You breathe a sigh of relief: this level has direct access to the docks. As you shuffle onwards, you see two mercs arguing ahead and quickly drop down behind a nearby crate. You have two choices: fight or find an alternative route.")
 
         if itemCheck("Anti-Rad Meds"):
 
@@ -432,8 +430,7 @@ else:
                     "Warehouse level",
                     "The player takes their anti-radiation medication.",
                     f"The player recovers {restored} health.",
-                    "You swallow the anti-radiation medication. "
-                    "Gradually, you begin to feel a little stronger."
+                    "You take the anti-radiation medication. Gradually, the nausea begins to subside and you feel stronger."
                 )
 
                 setResult("heal", story, restored)
@@ -446,7 +443,7 @@ else:
                     "Warehouse level",
                     "The player engages two armed mercenaries in a firefight. The player has the element of surprise.",
                     4,
-                    "The player defeats both enemies and takes one of their sets of body armour",
+                    "The player defeats both enemies and takes one of their sets of body armour.",
                     "You rapidly fire two shots at the mercenaries, aiming at the weak spot between the helmet and the shoulder pads. Both of them drop to the ground and you strip one of them of their armour.",
                     "The player misses one of his shots, alerting the mercs to his presence and takes a bullet in the process, becoming wounded.",
                     "Your first shot hits but your second only wings the target. The element of surprise lost, they manage to get a shot in before you dive back behind the crate, wounding you.",
@@ -478,7 +475,7 @@ else:
                     "Warehouse level",
                     "The player continues to engage the two armed mercenaries, the element of surprise now lost.",
                     4,
-                    "The player defeats both enemies and takes one of their sets of body armour",
+                    "The player defeats both enemies and takes one of their sets of body armour.",
                     "You pop out of cover, quickly firing off a volley shots. Both mercs are now down and you strip one of them of their armour.",
                     "The player is wounded again.",
                     "Your salvo misses the mark and you are caught by another bullet, further wounding you.",
@@ -492,7 +489,7 @@ else:
                             "Warehouse level",
                             "The player abandons the fight and flees down a side corridor to find a different route to the docks.",
                             "The player escapes but does not acquire the mercenary armour.",
-                            "You feel your strength ebbing so you use what little of it you have left to retreat into a side corridor hoping to find an alternate route. You hear the mercs laughing obnoxiously behind you but they do not give chase."
+                            "You feel your strength ebbing so you use what little of it you have left to retreat into a side corridor, hoping to find an alternate route. You hear the mercs laughing obnoxiously behind you but they do not give chase."
                         )
                         setResult=("success", story)
     # ================================================================
@@ -510,7 +507,7 @@ else:
                 "Eros Docking Ring: Berth D34",
                 "The player tries to sneak past the guards. If they have the Mercenary Armour then they hide down a corridor to put it on before attempting to sneak past.",
                 5,
-                "The player successfully talks their way past the guards and enters the ship. He sees the ship's name, 'Rocinante', and thinks it oddly familiar",
+                "The player successfully talks their way past the guards and enters the ship. He sees the ship's name, 'Rocinante', and thinks it oddly familiar.",
                 "You engage the guards in conversation and somehow manage to finagle your way on board the ship.",
                 "The player tries to sneak past the guards but they're suspicious so he has to flee and try something else.",
                 "You try to engage the guards in conversation but they raise their rifles and order you back to the radiation shelter. Maybe you need to try a new tack.",
