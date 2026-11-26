@@ -273,7 +273,10 @@ else:
     # ================================================================
 
     elif zone == "hotel":
-        showZone("🏩 Blue Falcon Hotel", f"You exit the vac-tube into a dingy tunnel. A feeble blue sign reading 'BLUE FALCON HOTEL' is barely visible 200 metres spinward. As you approach the entrance, you realise that 'hotel' is a grandiose claim for what is little more than a flophouse. \nYou walk through the door anyway, a sense of unease starting to trail its fingers down your spine. There's not much to see, just a busted old vending machine, a couple of old couches (on one of which is a shifty middle-aged woman reading a magazine), and an info terminal. \nThe staircase to the rooms is on your right.")
+        showZone("🏩 Blue Falcon Hotel",
+                 f"You exit the vac-tube into a dingy tunnel. A feeble blue sign reading 'BLUE FALCON HOTEL' is barely visible 200 metres spinward. As you approach the entrance, you realise that 'hotel' is a grandiose claim for what is little more than a flophouse. \n\n"
+                 "You walk through the door anyway, a sense of unease starting to trail its fingers down your spine. There's not much to see, just a busted old vending machine, a couple of old couches (on one of which is a shifty middle-aged woman reading a magazine), and an info terminal. \n\n"
+                 "The staircase to the rooms is on your right.")
         if not st.session_state.actionComplete:
             left, right = st.columns(2)
             with left:
@@ -356,7 +359,9 @@ else:
     # ================================================================
 
     elif zone == "casino2":
-        showZone("🎲 Casino Level", "The coast clear, you head down the ramp back to the Casino Level. As you walk, you hear a loud klaxon and an announcement on the PA system: 'Citizens of Eros, there has been an uncontained engine explosion in docking bay D74. As a precaution, all citizens are advised to head to the nearest hard radiation shelter. Officers will be on hand to guide you. There is no need for panic so please proceed in a calm and orderley manner.' You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
+        showZone("🎲 Casino Level", 
+                 f"The coast clear, you head down the ramp back to the Casino Level. As you walk, you hear a loud klaxon and an announcement on the PA system: 'Citizens of Eros, there has been an uncontained engine explosion in docking bay D74. As a precaution, all citizens are advised to head to the nearest hard radiation shelter. Officers will be on hand to guide you. There is no need for panic so please proceed in a calm and orderley manner.'\n\n"
+                 "You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
 
         if not st.session_state.radDamageApplied:
             # Set damage to 100 to test game over
