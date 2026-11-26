@@ -22,9 +22,11 @@ st.title("🚀 ESCAPE FROM EROS 🚀")
 # GAME SETUP - Persistent values and AI prompt
 # ================================================================
 
+# Game start flag
 if "gameStarted" not in st.session_state:
     st.session_state.gameStarted = False
 
+# Define starting values/flags
 def startGame(name):
     st.session_state.gameStarted = True
     st.session_state.playerName = name
@@ -44,13 +46,16 @@ def startGame(name):
     st.session_state.radDamage = 0
     st.session_state.deathReason = ""
 
+# Option to restart game
 def restartGame():
     st.session_state.clear()
     st.rerun()
- 
+
+# Track which zone the player is in 
 def getCurrentZone():
     return st.session_state.zones[st.session_state.zoneNumber]
- 
+
+# Continue game and increment zone
 def continueGame():
     st.session_state.resultType = ""
     st.session_state.resultMessage = ""
@@ -59,6 +64,7 @@ def continueGame():
     st.session_state.zoneNumber += 1
     st.rerun()
 
+# Add, check, remove item functions
 def itemAdd(item):
     if item not in st.session_state.inventory:
         st.session_state.inventory.append(item)
@@ -70,18 +76,19 @@ def itemRemove(item):
     if item in st.session_state.inventory:
         st.session_state.inventory.remove(item)
 
+# Damage taken handler
 def takeDamage(amount, reason):
     st.session_state.health =max(0, st.session_state.health - amount)
     if st.session_state.health == 0:
         st.session_state.deathReason = reason
-    if st.session_state.health < 0:
-        st.session_state.health = 0
 
+# Health restoration handler
 def restoreHealth(amount):
     healthOld = st.session_state.health
     st.session_state.health = min(st.session_state.healthMax, st.session_state.health + amount)
     return st.session_state.health - healthOld
 
+# AI story generation
 def generateStory(zone, action, outcome, fallback):
 # Temporarily disable AI for testing
    return fallback
@@ -126,9 +133,11 @@ def generateStory(zone, action, outcome, fallback):
 #         st.error(f"Gemini error: {error}")
 #         return fallback
 
+# RNG
 def rng():
     return random.randint(1,6)
 
+# Encounter handler
 def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, successFallback, failureOutcome, failureFallback, damage, bonusItem ="", successItem="", bonusFlag="", deathReason=""):
     if st.button(buttonText):
         roll = rng()
@@ -145,16 +154,17 @@ def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, suc
             takeDamage(damage, deathReason)
             story = generateStory(zone, action, failureOutcome, failureFallback)
             setResult("damage", story, damage)
-        st.rerun()
 
 # ================================================================
 # REUSABLE FUNCTIONS - Text and interactive elements
 # ================================================================
 
+# Zone intro
 def showZone(title, description):
     st.header(title)
     st.write(description)
- 
+
+# Player info text
 def showPlayerInfo():
     st.subheader(f"🧑 {st.session_state.playerName} ")
     left, right = st.columns(2)
@@ -168,34 +178,38 @@ def showPlayerInfo():
     )
     st.divider()
 
+# Result handler
 def setResult(resultType, message, value=""):
     st.session_state.resultType = resultType
     st.session_state.resultMessage = message
     st.session_state.resultValue = value
     st.session_state.actionComplete = True
     st.rerun()
- 
+
+# Indicate outcome to player
 def showResult():
     kind = st.session_state.resultType
     value = st.session_state.resultValue
  
     if kind == "item":
-        st.success(f"🎒 NEW ITEM: {value}")
+        st.success(f"🎒 NEW ITEM: {value}. 🎒")
     elif kind == "damage":
-        st.error(f"💔 DAMAGE: You lose {value} health.")
+        st.error(f"💔 DAMAGE: You lose {value} health. 💔")
     elif kind == "heal":
-        st.success(f"💚 HEALED: You recover {value} health.")
+        st.success(f"💚 You recover {value} health. 💚")
     elif kind == "success":
-        st.success("✅ Success!")
+        st.success("✅ Bingo!! ✅")
     else:
-        st.info("The journey continues...")
+        st.info("➡️➡️➡️")
  
     st.write(st.session_state.resultMessage)
- 
+
+# Move to next zone
 def showContinueButton(text = "Continue"):
     if st.button(text):
         continueGame()
 
+# Reset decision if wrong choice made
 def resetAction():
     st.session_state.resultType = ""
     st.session_state.resultMessage = ""
@@ -207,16 +221,20 @@ def resetAction():
 # START SCREEN - Arrival at Eros docks
 # ================================================================
 
+# Zone intro
 if not st.session_state.gameStarted:
     st.write("You disembark the ship, glad to leave the cramped, hot cabin of the ancient passenger transport. As you step onto the docks of another world, you gaze around, heedless of the other arrivals pushing past you. 'Not all that different from Ceres...', you muse.")
     name = st.text_input("An immigration officer saunters over, a sly smile on his face as he asks you for your ID. 'So, who do we got here, beratna?', he asks in a thick Belter accent.")
- 
+
+    # Name input
     if st.button("🛂Present ID and enter Eros Station"):
         if name.strip():
             startGame(name)
             st.rerun()
         else:
             st.warning("'Don't sound like no name I ever heard of. Wanna run that by me again?', the immigration officer asks.")
+
+# Game over handler
 else:
     showPlayerInfo()
     zone = getCurrentZone()
@@ -232,8 +250,9 @@ else:
     # ================================================================
     # ZONE 1 - Eros Docking Ring, Sematimba meeting
     # ================================================================
+
     if zone == "docks1":
-        showZone(f"🚀 Eros Docking Ring", "You stroll past the immigration officer, still gawking at your surroundings. You hear a familar voice ring out, 'there you are, you old fraud! Were you gonna walk on by without saying hi to an old friend?'")
+        showZone(f"🚀 Eros Docking Ring", "You stroll past the immigration officer, still gawking at your surroundings. You hear a familar voice ring out: 'There you are, you old fraud! Were you gonna walk on by without saying hi to an old friend?'")
         showContinueButton("🤝 Greet your old buddy")
 
     # ================================================================
@@ -241,12 +260,14 @@ else:
     # ================================================================
 
     elif zone == "casino1":
-        showZone("🎲 Casino Level", "A riot of sound and colour assault your senses as you step into one of Eros' three famed casino levels. Your old friend, Sematimba, all but drags you to a noodle cart. 'Try the soba! Best in the Belt!', he claims enthusiastically.")
+        showZone("🎲 Casino Level", 
+                 f"A riot of sound and colour assault your senses as you step into one of Eros' three famed casino levels. Your old friend, Sematimba, all but drags you to a noodle cart.\n\n"
+                 "'Try the soba! Best in the Belt!', he claims enthusiastically.")
         if not st.session_state.actionComplete:
             left, right = st.columns(2)
             with left:
                 if st.button("🍜 Sit and eat"):
-                    st.session_state.noodles = True
+                    st.session_state.noodles = True # Set flag for Zone 4 encounter
                     story = generateStory(
                         "Casino Level", 
                         "The player sits down with Sematimba, a cop on Eros, to eat noodles and trade war stories about the interjurisdictional case they worked together while the player was a detective on Ceres.", 
@@ -256,7 +277,7 @@ else:
                     setResult("story", story)
             with right:
                 if st.button("🙂‍↔ Decline the invitation"):
-                    st.session_state.noodles = False
+                    st.session_state.noodles = False # Set flag for Zone 4 encounter
                     story = generateStory(
                         "Casino Level", 
                         "The player decides not to accept the invitation, instead moving on as they're in a rush.", 
@@ -273,47 +294,91 @@ else:
     # ================================================================
 
     elif zone == "hotel":
-        showZone("🏩 Blue Falcon Hotel",
-                 f"You exit the vac-tube into a dingy tunnel. A feeble blue sign reading 'BLUE FALCON HOTEL' is barely visible 200 metres spinward. As you approach the entrance, you realise that 'hotel' is a grandiose claim for what is little more than a flophouse. \n\n"
-                 "You walk through the door anyway, a sense of unease starting to trail its fingers down your spine. There's not much to see, just a busted old vending machine, a couple of old couches (on one of which is a shifty middle-aged woman reading a magazine), and an info terminal. \n\n"
-                 "The staircase to the rooms is on your right.")
-        if not st.session_state.actionComplete:
-            left, right = st.columns(2)
-            with left:
-                if st.button("🖥️ Access the terminal"):
-                    st.session_state.terminal = True
-                    story = generateStory(
-                        "Hotel/flophouse called The Blue Falcon Hotel",
-                        "The player checks the room listings on the terminal and spots 'Lionel Polanski', a known alias of Julie Mao, in room 25.",
-                        "The player notes the room number down and turns to head up the stairs.",
-                        "You swipe through the list of guests and find Lionel Polanski, a known alias of Julie Mao, in room 25. You make a mental note of the room number and turn towards the stairs."
-                    )
-                    setResult("success", story)
-            with right:
+        showZone(
+            "🏩 Blue Falcon Hotel",
+            "You exit the vac-tube into a dingy tunnel. A feeble blue sign reading "
+            "'BLUE FALCON HOTEL' is barely visible 200 metres spinward. As you approach "
+            "the entrance, you realise that 'hotel' is a grandiose claim for what is "
+            "little more than a flophouse.\n\n"
+            "You walk through the door anyway, a sense of unease starting to trail its "
+            "fingers down your spine. There's not much to see, just a busted old vending "
+            "machine, a couple of old couches (on one of which is a shifty middle-aged "
+            "woman reading a magazine), and an info terminal.\n\n"
+            "The staircase to the rooms is on your right."
+        )
+
+        # Function to deal with terminal or stairs choice
+        def handleHotelStairs():
+            if st.session_state.terminal:
+                story = generateStory(
+                    "Hotel/flophouse called The Blue Falcon Hotel",
+                    "The player checks the room listings on the terminal and spots "
+                    "'Lionel Polanski', a known alias of Julie Mao, in room 25.",
+                    "The player notes the room number down and heads upstairs. In room "
+                    "25, they find Julie Mao dead in the shower, infected by a glowing "
+                    "blue organism.",
+                    "You apprehensively climb the stairs and find room 25. As you enter, "
+                    "a rotting smell assails your nostrils. You notice that the light "
+                    "switch doesn't work and there isn't the usual glow of electronics. "
+                    "You find Julie in the shower, dead and infected by a glowing blue "
+                    "organism of some kind."
+                )
+                setResult("success", story)
+            else:
+                story = generateStory(
+                    "Hotel/flophouse called The Blue Falcon Hotel",
+                    "The player goes straight up the stairs and picks a random, wrong "
+                    "room number between 20 and 30 but not 25.",
+                    "The player knocks on the wrong door and a cantankerous old man "
+                    "shouts at him for disturbing his meal.",
+                    "You realise you don't know which room Julie is in, so you pick one "
+                    "at random and knock on the door. An old man in a stained bathrobe "
+                    "opens it. 'WHADAYOOWANT?!', he yells, 'CAN'T A GUY HAVE DINNER IN "
+                    "PEACE?!' He slams the door but you still hear him muttering "
+                    "obscenities through the flimsy material."
+                )
+                setResult("story", story)
+
+        # Function to handle scene conclusion once terminal is chosen
+        def showHotelChoices():
+            if st.session_state.terminal:
                 if st.button("🪜 Climb the stairs"):
-                    if st.session_state.terminal:
+                    handleHotelStairs()
+            else:
+                left, right = st.columns(2)
+
+                with left:
+                    if st.button("🖥️ Access the terminal"):
+                        st.session_state.terminal = True
                         story = generateStory(
                             "Hotel/flophouse called The Blue Falcon Hotel",
-                            "The player checks the room listings on the terminal and spots 'Lionel Polanski', a known alias of Julie Mao, in room 25.",
-                            "The player notes the room number down and heads up the stairs to find it. Upon entering the room, they find Julie Mao dead in the shower, her corpse infected with some kind of glowing blue organism. All electronic devices in the room have been destroyed.",
-                            "You apprehensively climb the stairs and find room 25. As you enter, a rotting smell assails your nostrils. You notice that the light switch doesn't work and there isn't the usual glow of electronics. You find Julie in the shower, dead and infected by a glowing blue organism of some kind."
-                    )
-                        setResult("success", story)
-                    else:
-                        story = generateStory(
-                            "Hotel/flophouse called The Blue Falcon Hotel",
-                            "The player goes straight up the stairs and picks a random, wrong room number between 20 and 30 but not 25.",
-                            "The player knocks on the wrong door and a cantankerous old man shouts at him for disturbing his meal. The player decides to return to the lobby to check the terminal.",
-                            "You realise you don't know which room Julie is in so you pick one at random and knock on the door. An old man in a stained bathrobe opens it. 'WHADAYOOWANT?!', he yells, 'CAN'T A GUY HAVE DINNER IN PEACE?!' He slams the door but you still hear him muttering obscenities through the flimsy material."
+                            "The player checks the room listings on the terminal and "
+                            "spots 'Lionel Polanski', a known alias of Julie Mao, in "
+                            "room 25.",
+                            "The player notes the room number down and turns to head "
+                            "upstairs.",
+                            "You swipe through the list of guests and find Lionel "
+                            "Polanski, a known alias of Julie Mao, in room 25. You make "
+                            "a mental note of the room number and turn towards the "
+                            "stairs."
                         )
                         setResult("story", story)
+
+                with right:
+                    if st.button("🪜 Climb the stairs"):
+                        handleHotelStairs()
+
+        if not st.session_state.actionComplete:
+            showHotelChoices()
         else:
             showResult()
+
             if st.session_state.resultType == "success":
                 showContinueButton("Continue")
             else:
-                if st.button("↩️ Return to the lobby"):
-                    resetAction()
+                showHotelChoices()
+
+
 
     # ================================================================
     # ZONE 4 - Residential tunnel, shootout with mercs
@@ -332,8 +397,8 @@ else:
                 "The player is wounded during the firefight but survives.",
                 "You exchange fire with the mercs, but one of them wings you. You fire a couple more shots, driving them back into cover.",
                 20,
-                bonusFlag="noodles",
-                deathReason="You took too many bullets and were fatally wounded."
+                bonusFlag="noodles", # Sematimba flag
+                deathReason="You took too many bullets and were fatally wounded." # Game Over screen info
             )
         else:
             showResult()
@@ -350,8 +415,8 @@ else:
                     "The player takes another graze from a bullet.",
                     "Another bullet grazes you. Your breath is starting to come in ragged gasps but you keep on fighting.",
                     20,
-                    bonusFlag="noodles",
-                    deathReason="You took too many bullets and were fatally wounded."
+                    bonusFlag="noodles", # Sematimba flag
+                    deathReason="You took too many bullets and were fatally wounded." # Game Over screen info
                 )
 
     # ================================================================
@@ -364,9 +429,7 @@ else:
                  "You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
 
         if not st.session_state.radDamageApplied:
-            # Set damage to 100 to test game over
-            # damage = 100
-            damage = random.choice([30, 40, 50, 60])
+            damage = random.choice([30, 40, 50, 60]) # Apply random radiation damage
             takeDamage(damage, "You took too high a dose of radiation.")
             st.session_state.radDamageApplied = True
             st.session_state.radDamage = damage
@@ -407,12 +470,13 @@ else:
         else:
             showResult()
 
-            if itemCheck("Anti-Rad Medication"):
+            # Anti-rad meds button handler
+            if itemCheck("Anti-Rad Meds"):
 
                 if st.button("💊 Administer anti-rad medication"):
 
                     restored = restoreHealth(50)
-                    itemRemove("Anti-Rad Medication")
+                    itemRemove("Anti-Rad Meds")
 
                     story = generateStory(
                         "Casino level",
@@ -432,6 +496,7 @@ else:
     elif zone == "warehouse":
         showZone("🏭 Warehouse Level", "You make your way out of the casino level and find yourself in the warehouse level. You breathe a sigh of relief: this level has direct access to the docks. As you shuffle onwards, you see two mercs arguing ahead and quickly drop down behind a nearby crate. You have two choices: fight or find an alternative route.")
 
+        # Anti-rad meds button handler
         if itemCheck("Anti-Rad Meds"):
 
             if st.button("💊 Administer anti-rad medication"):
@@ -461,8 +526,8 @@ else:
                     "The player misses one of his shots, alerting the mercs to his presence and takes a bullet in the process, becoming wounded.",
                     "Your first shot hits but your second only wings the target. The element of surprise lost, they manage to get a shot in before you dive back behind the crate, wounding you.",
                     20,
-                    successItem="Mercenary Armour",
-                    deathReason="You took too many bullets and were fatally wounded."
+                    successItem="Mercenary Armour", # Item adds bonus to RNG check in next zone
+                    deathReason="You took too many bullets and were fatally wounded." # Game Over screen info
                 )
             with right:
                 if st.button("🏃‍➡️ Find another route"):
@@ -494,8 +559,8 @@ else:
                     "The player is wounded again.",
                     "Your salvo misses the mark and you are caught by another bullet, further wounding you.",
                     20,
-                    successItem="Mercenary Armour",
-                    deathReason="You took too many bullets and were fatally wounded."
+                    successItem="Mercenary Armour", # Item adds bonus to RNG check in next zone
+                    deathReason="You took too many bullets and were fatally wounded." # Game Over screen info
                     )
 
                 with right:
@@ -506,7 +571,7 @@ else:
                             "The player escapes but does not acquire the mercenary armour.",
                             "You feel your strength ebbing so you use what little of it you have left to retreat into a side corridor, hoping to find an alternate route. You hear the mercs laughing obnoxiously behind you but they do not give chase."
                         )
-                        setResult=("success", story)
+                        setResult("success", story)
     # ================================================================
     # ZONE 7 - Docks exit, escape sequence
     # ================================================================
@@ -524,10 +589,11 @@ else:
                 5,
                 "The player successfully talks their way past the guards and enters the ship. He sees the ship's name, 'Rocinante', and thinks it oddly familiar.",
                 "You engage the guards in conversation and somehow manage to finagle your way on board the ship.",
-                "The player tries to sneak past the guards but they're suspicious so he has to flee and try something else.",
-                "You try to engage the guards in conversation but they raise their rifles and order you back to the radiation shelter. Maybe you need to try a new tack.",
+                "The player tries to sneak past the guards but they're suspicious so he has to flee and try something else. They open fire as the player flees.",
+                "You try to engage the guards in conversation but they raise their rifles and order you back to the radiation shelter, firing a couple of shots, one of which wings you. Maybe you need to try a new tack.",
                 20,
-                bonusItem="Mercenary Armour"
+                bonusItem="Mercenary Armour", # Adds bonus to sneak chance
+                deathReason="The guards saw through your bravado and opened fire, fatally wounding you." # Game Over screen info
             )
         else:
             showResult()
