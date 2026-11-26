@@ -17,7 +17,7 @@ The story allows players to explore different locations, interact with character
 3. Create a `.env` file in the project directory and add your Gemini API key:
    `GEMINI_API_KEY=your_api_key`
 4. Run the application:
-   `streamlit run app.py`
+   `streamlit run escapefromeros.py`
 
 ## Notes
 A personal project exploring interactive storytelling, branching narratives and AI-generated content.
