@@ -42,6 +42,7 @@ def startGame(name):
     st.session_state.terminal = False
     st.session_state.radDamageApplied = False
     st.session_state.radDamage = 0
+    st.session_state.deathReason = ""
 
 def restartGame():
     st.session_state.clear()
@@ -69,8 +70,10 @@ def itemRemove(item):
     if item in st.session_state.inventory:
         st.session_state.inventory.remove(item)
 
-def takeDamage(amount):
-    st.session_state.health -= amount
+def takeDamage(amount, reason):
+    st.session_state.health =max(0, st.session_state.health - amount)
+    if st.session_state.health == 0:
+        st.session_state.deathReason = reason
     if st.session_state.health < 0:
         st.session_state.health = 0
 
@@ -81,52 +84,52 @@ def restoreHealth(amount):
 
 def generateStory(zone, action, outcome, fallback):
 # Temporarily disable AI for testing
-#    return fallback
-    if client == None:
-        return fallback
+   return fallback
+#     if client == None:
+#         return fallback
 
 
-    inventoryText = ", ".join(st.session_state.inventory)
+#     inventoryText = ", ".join(st.session_state.inventory)
 
-    prompt = f"""
-You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
+#     prompt = f"""
+# You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
  
-Player: {st.session_state.playerName}
-Room: {zone}
-Health: {st.session_state.health}/{st.session_state.healthMax}
-Inventory: {inventoryText}
+# Player: {st.session_state.playerName}
+# Room: {zone}
+# Health: {st.session_state.health}/{st.session_state.healthMax}
+# Inventory: {inventoryText}
  
-Action:
-{action}
+# Action:
+# {action}
  
-Outcome:
-{outcome}
+# Outcome:
+# {outcome}
  
-Describe what happens in 30-50 words.
+# Describe what happens in 30-50 words.
  
-Use second person.
-Use gritty sci-fi language.
-Do not change the outcome.
-Do not change health or inventory.
-Do not introduce new choices.
-"""
-    try:
-        interaction = client.interactions.create(
-            model="gemini-3.5-flash-lite",
-            input=prompt,
-            generation_config={"thinking_level": "minimal"}
-        )
-        if interaction.output_text:
-            return interaction.output_text
-        return fallback
-    except Exception as error:
-        st.error(f"Gemini error: {error}")
-        return fallback
+# Use second person.
+# Use gritty sci-fi language.
+# Do not change the outcome.
+# Do not change health or inventory.
+# Do not introduce new choices.
+# """
+#     try:
+#         interaction = client.interactions.create(
+#             model="gemini-3.5-flash-lite",
+#             input=prompt,
+#             generation_config={"thinking_level": "minimal"}
+#         )
+#         if interaction.output_text:
+#             return interaction.output_text
+#         return fallback
+#     except Exception as error:
+#         st.error(f"Gemini error: {error}")
+#         return fallback
 
 def rng():
     return random.randint(1,6)
 
-def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, successFallback, failureOutcome, failureFallback, damage, bonusItem ="", successItem="", bonusFlag=""):
+def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, successFallback, failureOutcome, failureFallback, damage, bonusItem ="", successItem="", bonusFlag="", deathReason=""):
     if st.button(buttonText):
         roll = rng()
         if bonusItem != "" and itemCheck(bonusItem):
@@ -139,7 +142,7 @@ def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, suc
             story = generateStory(zone, action, successOutcome, successFallback)
             setResult("success", story)
         else:
-            takeDamage(damage)
+            takeDamage(damage, deathReason)
             story = generateStory(zone, action, failureOutcome, failureFallback)
             setResult("damage", story, damage)
         st.rerun()
@@ -219,8 +222,9 @@ else:
     zone = getCurrentZone()
 
     if st.session_state.health <= 0:
-        showZone("💀 You Died", "As the last of your strength ebbs, you fatalistically mumble, 'some you win, some you lose...'")
+        st.header("💀 GAME OVER")
         st.error("Mission failed...")
+        st.write(f"Cause: {st.session_state.deathReason}")
         if st.button("🔄 Retry?"):
             restartGame()
         st.stop()
@@ -325,7 +329,8 @@ else:
                 "The player is wounded during the firefight but survives.",
                 "You exchange fire with the mercs, but one of them wings you. You fire a couple more shots, driving them back into cover.",
                 20,
-                bonusFlag="noodles"
+                bonusFlag="noodles",
+                deathReason="You took too many bullets and were fatally wounded."
             )
         else:
             showResult()
@@ -342,7 +347,8 @@ else:
                     "The player takes another graze from a bullet.",
                     "Another bullet grazes you. Your breath is starting to come in ragged gasps but you keep on fighting.",
                     20,
-                    bonusFlag="noodles"
+                    bonusFlag="noodles",
+                    deathReason="You took too many bullets and were fatally wounded."
                 )
 
     # ================================================================
@@ -353,8 +359,10 @@ else:
         showZone("🎲 Casino Level", "The coast clear, you head down the ramp back to the Casino Level. As you walk, you hear a loud klaxon and an announcement on the PA system: 'Citizens of Eros, there has been an uncontained engine explosion in docking bay D74. As a precaution, all citizens are advised to head to the nearest hard radiation shelter. Officers will be on hand to guide you. There is no need for panic so please proceed in a calm and orderley manner.' You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
 
         if not st.session_state.radDamageApplied:
+            # Set damage to 100 to test game over
+            # damage = 100
             damage = random.choice([30, 40, 50, 60])
-            takeDamage(damage)
+            takeDamage(damage, "You took too high a dose of radiation.")
             st.session_state.radDamageApplied = True
             st.session_state.radDamage = damage
 
@@ -448,7 +456,8 @@ else:
                     "The player misses one of his shots, alerting the mercs to his presence and takes a bullet in the process, becoming wounded.",
                     "Your first shot hits but your second only wings the target. The element of surprise lost, they manage to get a shot in before you dive back behind the crate, wounding you.",
                     20,
-                    successItem="Mercenary Armour"
+                    successItem="Mercenary Armour",
+                    deathReason="You took too many bullets and were fatally wounded."
                 )
             with right:
                 if st.button("🏃‍➡️ Find another route"):
@@ -480,7 +489,8 @@ else:
                     "The player is wounded again.",
                     "Your salvo misses the mark and you are caught by another bullet, further wounding you.",
                     20,
-                    successItem="Mercenary Armour"
+                    successItem="Mercenary Armour",
+                    deathReason="You took too many bullets and were fatally wounded."
                     )
 
                 with right:
