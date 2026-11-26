@@ -3,12 +3,12 @@ import streamlit as st
 import random
 from dotenv import load_dotenv
 from google import genai
- 
+
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
- 
+
 client = genai.Client(api_key=api_key) if api_key else None
- 
+
 MODEL_NAME = "gemini-3.5-flash-lite"
 
 # ================================================================
@@ -51,7 +51,7 @@ def restartGame():
     st.session_state.clear()
     st.rerun()
 
-# Track which zone the player is in 
+# Track which zone the player is in
 def getCurrentZone():
     return st.session_state.zones[st.session_state.zoneNumber]
 
@@ -78,7 +78,7 @@ def itemRemove(item):
 
 # Damage taken handler
 def takeDamage(amount, reason):
-    st.session_state.health =max(0, st.session_state.health - amount)
+    st.session_state.health = max(0, st.session_state.health - amount)
     if st.session_state.health == 0:
         st.session_state.deathReason = reason
 
@@ -91,54 +91,54 @@ def restoreHealth(amount):
 # AI story generation
 def generateStory(zone, action, outcome, fallback):
 # Temporarily disable AI for testing
-   return fallback
-#     if client == None:
-#         return fallback
+#    return fallback
+    if client == None:
+        return fallback
 
 
-#     inventoryText = ", ".join(st.session_state.inventory)
+    inventoryText = ", ".join(st.session_state.inventory)
 
-#     prompt = f"""
-# You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
- 
-# Player: {st.session_state.playerName}
-# Room: {zone}
-# Health: {st.session_state.health}/{st.session_state.healthMax}
-# Inventory: {inventoryText}
- 
-# Action:
-# {action}
- 
-# Outcome:
-# {outcome}
- 
-# Describe what happens in 30-50 words.
- 
-# Use second person.
-# Use gritty sci-fi language.
-# Do not change the outcome.
-# Do not change health or inventory.
-# Do not introduce new choices.
-# """
-#     try:
-#         interaction = client.interactions.create(
-#             model="gemini-3.5-flash-lite",
-#             input=prompt,
-#             generation_config={"thinking_level": "minimal"}
-#         )
-#         if interaction.output_text:
-#             return interaction.output_text
-#         return fallback
-#     except Exception as error:
-#         st.error(f"Gemini error: {error}")
-#         return fallback
+    prompt = f"""
+    You are telling a story of how a disgraced Ceres detective travels to Eros (a space station in a mined out asteroid) to find a girl called Julie Mao. The case of Julie Mao, a rich Earther girl who joined the radical Belter faction, the OPA (Outer Planets Alliance), was given to him by his boss but he was told to let it go and then was fired when he didn't. The backdrop is The Expanse (book series by James SA Corey.)
+
+    Player: {st.session_state.playerName}
+    Room: {zone}
+    Health: {st.session_state.health}/{st.session_state.healthMax}
+    Inventory: {inventoryText}
+
+    Action:
+    {action}
+
+    Outcome:
+    {outcome}
+
+    Describe what happens in 30-50 words.
+
+    Use second person.
+    Use gritty sci-fi language.
+    Do not change the outcome.
+    Do not change health or inventory.
+    Do not introduce new choices.
+    """
+    try:
+        interaction = client.interactions.create(
+            model="gemini-3.5-flash-lite",
+            input=prompt,
+            generation_config={"thinking_level": "minimal"}
+        )
+        if interaction.output_text:
+            return interaction.output_text
+        return fallback
+    except Exception as error:
+        st.error(f"Gemini error: {error}")
+        return fallback
 
 # RNG
 def rng():
-    return random.randint(1,6)
+    return random.randint(1, 6)
 
 # Encounter handler
-def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, successFallback, failureOutcome, failureFallback, damage, bonusItem ="", successItem="", bonusFlag="", deathReason=""):
+def chanceEncounter(buttonText, zone, action, successNumber, successOutcome, successFallback, failureOutcome, failureFallback, damage, bonusItem="", successItem="", bonusFlag="", deathReason=""):
     if st.button(buttonText):
         roll = rng()
         if bonusItem != "" and itemCheck(bonusItem):
@@ -171,7 +171,7 @@ def showPlayerInfo():
     with left:
         st.write(f"❤️ Health: {st.session_state.health} / {st.session_state.healthMax}")
     with right:
-        st.write(f"🎒 Inventory: {', '.join(st.session_state.inventory)}")  
+        st.write(f"🎒 Inventory: {', '.join(st.session_state.inventory)}")
     st.caption(
         f"Zone {st.session_state.zoneNumber + 1} "
         f"of {len(st.session_state.zones)}"
@@ -190,7 +190,7 @@ def setResult(resultType, message, value=""):
 def showResult():
     kind = st.session_state.resultType
     value = st.session_state.resultValue
- 
+
     if kind == "item":
         st.success(f"🎒 NEW ITEM: {value}. 🎒")
     elif kind == "damage":
@@ -201,11 +201,11 @@ def showResult():
         st.success("✅ Bingo!! ✅")
     else:
         st.info("➡️➡️➡️")
- 
+
     st.write(st.session_state.resultMessage)
 
 # Move to next zone
-def showContinueButton(text = "Continue"):
+def showContinueButton(text="Continue"):
     if st.button(text):
         continueGame()
 
@@ -260,7 +260,7 @@ else:
     # ================================================================
 
     elif zone == "casino1":
-        showZone("🎲 Casino Level", 
+        showZone("🎲 Casino Level",
                  f"A riot of sound and colour assault your senses as you step into one of Eros' three famed casino levels. Your old friend, Sematimba, all but drags you to a noodle cart.\n\n"
                  "'Try the soba! Best in the Belt!', he claims enthusiastically.")
         if not st.session_state.actionComplete:
@@ -269,9 +269,9 @@ else:
                 if st.button("🍜 Sit and eat"):
                     st.session_state.noodles = True # Set flag for Zone 4 encounter
                     story = generateStory(
-                        "Casino Level", 
-                        "The player sits down with Sematimba, a cop on Eros, to eat noodles and trade war stories about the interjurisdictional case they worked together while the player was a detective on Ceres.", 
-                        "The player is happy to have seen and reconnected with a friendly face and Sematimba says to the player that if they need a hand while they're on Eros, to reach out to him.", 
+                        "Casino Level",
+                        "The player sits down with Sematimba, a cop on Eros, to eat noodles and trade war stories about the interjurisdictional case they worked together while the player was a detective on Ceres.",
+                        "The player is happy to have seen and reconnected with a friendly face and Sematimba says to the player that if they need a hand while they're on Eros, to reach out to him.",
                         "You sit at the grimy noodle cart and order the same as Sematimba. As you eat, you reminisce about a case you both worked together. As you finish up and stand up to move on, Sematimba claps your shoulder. 'You need a hand while you're here, you know where to find me.'"
                         )
                     setResult("story", story)
@@ -279,9 +279,9 @@ else:
                 if st.button("🙂‍↔ Decline the invitation"):
                     st.session_state.noodles = False # Set flag for Zone 4 encounter
                     story = generateStory(
-                        "Casino Level", 
-                        "The player decides not to accept the invitation, instead moving on as they're in a rush.", 
-                        "The player briefly clasps Sematimba's shoulder and say 'some other time, buddy' before hurrying off towards the nearest vac-tube station.", 
+                        "Casino Level",
+                        "The player decides not to accept the invitation, instead moving on as they're in a rush.",
+                        "The player briefly clasps Sematimba's shoulder and say 'some other time, buddy' before hurrying off towards the nearest vac-tube station.",
                         "'Sorry, buddy', you say, 'in a hell of a rush right now. Rain check?' 'Sure thing...', a bemused Sematimba says, watching you stride on towards the nearest vac-tube station."
                         )
                     setResult("story", story)
@@ -339,7 +339,7 @@ else:
                 )
                 setResult("story", story)
 
-        # Function to handle scene conclusion once terminal is chosen
+        # Function to render available choices
         def showHotelChoices():
             if st.session_state.terminal:
                 if st.button("🪜 Climb the stairs"):
@@ -424,7 +424,7 @@ else:
     # ================================================================
 
     elif zone == "casino2":
-        showZone("🎲 Casino Level", 
+        showZone("🎲 Casino Level",
                  f"The coast clear, you head down the ramp back to the Casino Level. As you walk, you hear a loud klaxon and an announcement on the PA system: 'Citizens of Eros, there has been an uncontained engine explosion in docking bay D74. As a precaution, all citizens are advised to head to the nearest hard radiation shelter. Officers will be on hand to guide you. There is no need for panic so please proceed in a calm and orderley manner.'\n\n"
                  "You see a guard near a tall metal door ushering nervous citizens into one of the shelters. You head over just as a blinding flash of searing white light slams into your retinas. Your hand terminal buzzes furiously, telling you that you have just received a lethal dose of gamma radiation.")
 
