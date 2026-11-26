@@ -200,7 +200,7 @@ def showResult():
     elif kind == "success":
         st.success("✅ Bingo!! ✅")
     else:
-        st.info("➡️➡️➡️")
+        st.info("➡️")
 
     st.write(st.session_state.resultMessage)
 
@@ -224,6 +224,7 @@ def resetAction():
 # Zone intro
 if not st.session_state.gameStarted:
     st.write("You disembark the ship, glad to leave the cramped, hot cabin of the ancient passenger transport. As you step onto the docks of another world, you gaze around, heedless of the other arrivals pushing past you. 'Not all that different from Ceres...', you muse.")
+    st.write("You snap back into the present, remembering the reason you came to this forsaken rock: find Julie Mao. The only info you have is an alias, Lionel Polanski, and the name, 'Blue Falcon'.")
     name = st.text_input("An immigration officer saunters over, a sly smile on his face as he asks you for your ID. 'So, who do we got here, beratna?', he asks in a thick Belter accent.")
 
     # Name input
@@ -316,12 +317,15 @@ else:
                     "'Lionel Polanski', a known alias of Julie Mao, in room 25.",
                     "The player notes the room number down and heads upstairs. In room "
                     "25, they find Julie Mao dead in the shower, infected by a glowing "
-                    "blue organism.",
+                    "blue organism. They are regretful that they didn't get to her in time and then exit the room and hotel. "
+                    "The shifty woman on the couch says something into a hand terminal but the player doesn't notice.",
                     "You apprehensively climb the stairs and find room 25. As you enter, "
                     "a rotting smell assails your nostrils. You notice that the light "
                     "switch doesn't work and there isn't the usual glow of electronics. "
                     "You find Julie in the shower, dead and infected by a glowing blue "
-                    "organism of some kind."
+                    "organism of some kind. You sign and shake your head. 'Sorry I didn't get "
+                    " to you in time, kid.' "
+                    "You exit the hotel room and walk back out into the tunnel."
                 )
                 setResult("success", story)
             else:
