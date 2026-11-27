@@ -394,7 +394,7 @@ else:
             chanceEncounter(
                 "🔫 Fire at the mercenaries",
                 "Blue Falcon Hotel",
-                "The player engages a pair of armed mercs in a firefight. If the player ate noodles with Sematimba earlier, he provides backup.",
+                "The player engages a pair of armed mercs in a firefight. If the player ate noodles with Sematimba earlier, he provides backup. If they didn't then he does not appear at all.",
                 4,
                 "You fell both attackers!",
                 "You return fire, ducking in and out of the doorway between shots. Both attackers are finally downed and the coast is clear!",
