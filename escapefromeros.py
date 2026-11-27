@@ -605,6 +605,7 @@ else:
                 st.balloons()
                 st.title("🎉 ESCAPE SUCCESSFUL!")
                 st.write("You board the ship to find the crew about ready to depart. They seem to have no objection to another passenger so you settle into a crash couch, glad to leave the cursed asteroid behind.")
+                st.write("As the Rocinante speeds away from the asteroid, their comms officer says they're getting a transmission from Eros. What did you leave behind?")
 
                 st.success("Congratulations!")
 
